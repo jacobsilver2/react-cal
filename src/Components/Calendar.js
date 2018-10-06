@@ -5,8 +5,11 @@ import Event from './CalendarEvent/CalendarEvent';
 class Calendar extends Component {
     state = { 
         currentMonth: new Date(),
-        selectedDate: new Date()
+        selectedDate: new Date(),
+        events: []
      };
+
+     
 
      renderHeader(){
          const dateFormat = 'MMMM YYYY';
@@ -42,7 +45,10 @@ class Calendar extends Component {
          }
          return <div className="days row">{days}</div>
      }
-     renderCells() {
+
+
+
+     renderCells = () => {
         const { currentMonth, selectedDate } = this.state;
         const monthStart = dateFns.startOfMonth(currentMonth);
         const monthEnd = dateFns.endOfMonth(monthStart);
@@ -55,11 +61,12 @@ class Calendar extends Component {
         let days = [];
         let day = startDate;
         let formattedDate = "";
-    
+        let {events} = this.state
         while (day <= endDate) {
           for (let i = 0; i < 7; i++) {
             formattedDate = dateFns.format(day, dateFormat);
             const cloneDay = day;
+
             days.push(
               <div
                 className={`col cell ${
@@ -67,19 +74,20 @@ class Calendar extends Component {
                     ? "disabled"
                     : dateFns.isSameDay(day, selectedDate) ? "selected" : ""
                 }`}
-                key={day}
+                key={day.toString()}
                 onClick={() => this.onDateClick(dateFns.parse(cloneDay))}
               >
                 <span className="number">{formattedDate}</span>
                 <span className="bg">{formattedDate}</span>
-                
-                {dateFns.isSameDay(day, selectedDate) ? <Event day={day}/> : null}
+                { events.length > 0 ? this.renderEvent(events, day) : null}
               </div>
             );
             day = dateFns.addDays(day, 1);
-          }
-          rows.push(
+        }
+        
+        rows.push(
             <div className="row" key={day}>
+            
               {days}
             </div>
           );
@@ -88,11 +96,25 @@ class Calendar extends Component {
         return <div className="body">{rows}</div>;
       }
 
+
      onDateClick = day => {
          this.setState({
              selectedDate:day
          })
+         this.state.events.push(day)
      }
+
+     renderEvent = (events, day) => {
+
+        const event = events.filter(e => e.toString() === day.toString()
+        )
+        if (event.length > 0) {
+            return <Event day={event} />
+        } else {
+            return null
+        }
+     }
+
 
      nextMonth = () => {
          this.setState({
@@ -102,6 +124,8 @@ class Calendar extends Component {
      prevMonth = () => {
          this.setState({currentMonth: dateFns.subMonths(this.state.currentMonth, 1)})
      }
+
+
 
     render() {
         return (
