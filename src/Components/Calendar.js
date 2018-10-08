@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import dateFns from 'date-fns';
+import getMilliseconds from 'date-fns/get_milliseconds'
 import Event from './CalendarEvent/CalendarEvent';
 
 class Calendar extends Component {
@@ -106,10 +107,11 @@ class Calendar extends Component {
 
      renderEvent = (events, day) => {
 
-        const event = events.filter(e => e.toString() === day.toString()
+        const theEvents = events.filter(e => e.toString() === day.toString()
         )
-        if (event.length > 0) {
-            return <Event day={event} />
+        if (theEvents.length > 0) {
+            const d = getMilliseconds(new Date()).toString()
+            return theEvents.map(e => <Event key={d} day={e} />)
         } else {
             return null
         }
